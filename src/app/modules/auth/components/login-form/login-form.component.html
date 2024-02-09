@@ -27,6 +27,13 @@
         This field should be a email
       </p>
     </div>
+    <div *ngIf="status === 'failed'">
+      <p
+        class="font-medium text-red-500 text-xs mt-1 ml-1"
+      >
+        Credenciales Invalidas
+      </p>
+    </div>
   </div>
   <div>
     <div class="relative">
