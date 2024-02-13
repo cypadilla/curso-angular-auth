@@ -12,6 +12,11 @@ import { CustomValidators } from '@utils/validators';
   templateUrl: './register-form.component.html',
 })
 export class RegisterFormComponent {
+
+  formUser = this.formBuilder.nonNullable.group({
+    email:['',[Validators.email,Validators.required]]
+  });
+
   form = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.email, Validators.required]],
@@ -21,9 +26,11 @@ export class RegisterFormComponent {
     validators: [ CustomValidators.MatchValidator('password', 'confirmPassword') ]
   });
   status: RequestStatus = 'init';
+  statusUser: RequestStatus = 'init';
   faEye = faEye;
   faEyeSlash = faEyeSlash;
   showPassword = false;
+  showRegister = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -36,17 +43,43 @@ export class RegisterFormComponent {
       this.status = 'loading';
       const { name, email, password } = this.form.getRawValue();
       console.log(name, email, password);
-      this.authService.register(name, email,  password)
+      this.authService.registerAndLogin(name, email,  password)
       .subscribe({
         next: ()=>{
           this.status = 'success';
-          this.router.navigate(['/login'])
+          this.router.navigate(['/app/boards'])
           // {"name":"Cristian Padilla","email":"cristianp@gmail.com","password":"12345678"}
         },
         error: () => this.status = 'failed'
-      })
+      });
     } else {
       this.form.markAllAsTouched();
+    }
+  }
+
+  validateUser(){
+    if(this.formUser.valid){
+      this.statusUser = 'loading';
+      const { email } = this.formUser.getRawValue();
+      this.authService.isAvailable(email)
+      .subscribe({
+        next: (data)=>{
+          if(data.isAvailable){
+            this.statusUser = 'success';
+            this.form.controls.email.setValue(email);
+            this.showRegister = true;
+          }else{
+            this.router.navigate(['/login'],
+            { queryParams:
+              { email }
+            });
+          }
+          // {"name":"Cristian Padilla","email":"cristianp@gmail.com","password":"12345678"}
+        },
+        error: () => this.statusUser = 'failed'
+      });
+    }else {
+      this.formUser.markAsTouched();
     }
   }
 }
