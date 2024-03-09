@@ -48,7 +48,7 @@ export class RegisterFormComponent {
         next: ()=>{
           this.status = 'success';
           this.router.navigate(['/app/boards'])
-          // {"name":"Cristian Padilla","email":"cristianp@gmail.com","password":"12345678"}
+          // {"name":"Cristian Padilla","email":"cristian2@mail.com","password":"12345678"}
         },
         error: () => this.status = 'failed'
       });
